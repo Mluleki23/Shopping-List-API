@@ -1,10 +1,10 @@
-
 import { IncomingMessage, ServerResponse } from "http";
 import {
   getItems,
   getItemById,
   addItem,
   updateItem,
+  deleteItem,
 } from "../controllers/Items";
 
 // http://localhost:3000/items
@@ -14,14 +14,14 @@ export const itemsRoute = (req: IncomingMessage, res: ServerResponse) => {
   const parts = req.url.split("/");
   const id = parts[2] ? parseInt(parts[2]) : undefined;
 
-  //  GET all items
+  // GET all items
   if (req.method === "GET" && !id) {
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify(getItems()));
     return;
   }
 
-  //  GET item by ID
+  // GET item by ID
   if (req.method === "GET" && id) {
     if (isNaN(id)) {
       res.writeHead(400, { "Content-Type": "application/json" });
@@ -41,7 +41,7 @@ export const itemsRoute = (req: IncomingMessage, res: ServerResponse) => {
     return;
   }
 
-  //  POST new item
+  // POST new item
   if (req.method === "POST") {
     let body = "";
     req.on("data", (chunk) => (body += chunk.toString()));
@@ -77,7 +77,7 @@ export const itemsRoute = (req: IncomingMessage, res: ServerResponse) => {
     return;
   }
 
-  //  PUT (Update existing item)
+  // PUT (Update existing item)
   if (req.method === "PUT" && id) {
     let body = "";
     req.on("data", (chunk) => (body += chunk.toString()));
@@ -102,7 +102,22 @@ export const itemsRoute = (req: IncomingMessage, res: ServerResponse) => {
     return;
   }
 
-  //  Method not allowed
+  //  DELETE item by ID
+  if (req.method === "DELETE" && id) {
+    const success = deleteItem(id);
+
+    if (!success) {
+      res.writeHead(404, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Item not found" }));
+      return;
+    }
+
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
+  // Method not allowed
   res.writeHead(405, { "Content-Type": "application/json" });
   res.end(JSON.stringify({ error: "Method not allowed on /items" }));
 };

@@ -1,4 +1,3 @@
-
 import { Item } from "../types/Items";
 
 let items: Item[] = [];
@@ -23,7 +22,7 @@ export const addItem = (
   return newItem;
 };
 
-//  Update existing item
+// Update existing item
 export const updateItem = (
   id: number,
   updatedData: Partial<Item>
@@ -35,5 +34,11 @@ export const updateItem = (
   return items[index];
 };
 
+// ✅ Delete item by ID
+export const deleteItem = (id: number): boolean => {
+  const index = items.findIndex((item) => item.id === id);
+  if (index === -1) return false;
 
-
+  items.splice(index, 1);
+  return true;
+};
